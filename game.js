@@ -1,5 +1,5 @@
 const COLORS = ["red", "green", "yellow", "blue", "purple", "orange"];
-const PATH_LENGTH = 40;
+const TOKENS_PER_PLAYER = 4;
 
 let game = {
   players: [],
@@ -7,15 +7,25 @@ let game = {
   dice: 0
 };
 
-const board = document.getElementById("board");
 const turnText = document.getElementById("turnText");
 const diceText = document.getElementById("diceText");
+const diceEl = document.getElementById("dice");
 const rollBtn = document.getElementById("rollBtn");
 
-function startGame() {
-  const count = +document.getElementById("playerCount").value;
-  const namesDiv = document.getElementById("names");
+document.getElementById("playerCount")
+  .addEventListener("change", createNameInputs);
 
+function createNameInputs() {
+  const count = +playerCount.value;
+  names.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    names.innerHTML += `<input id="name${i}" placeholder="Player ${i+1}">`;
+  }
+}
+createNameInputs();
+
+function startGame() {
+  const count = +playerCount.value;
   game.players = [];
 
   for (let i = 0; i < count; i++) {
@@ -24,76 +34,85 @@ function startGame() {
       id: i,
       name,
       color: COLORS[i],
-      pos: 0,
+      tokens: Array(TOKENS_PER_PLAYER).fill(0),
       isCodeRed: name.toLowerCase() === "codered"
     });
   }
 
-  document.getElementById("setup").classList.add("hidden");
-  document.getElementById("game").classList.remove("hidden");
+  setup.classList.add("hidden");
+  gameDiv.classList.remove("hidden");
 
-  drawBoard();
+  createBoard();
+  renderTokens();
   updateTurn();
 }
-
-document.getElementById("playerCount").addEventListener("change", createNameInputs);
-
-function createNameInputs() {
-  const count = +document.getElementById("playerCount").value;
-  const namesDiv = document.getElementById("names");
-  namesDiv.innerHTML = "";
-
-  for (let i = 0; i < count; i++) {
-    namesDiv.innerHTML += `
-      <input id="name${i}" placeholder="Player ${i + 1} name">
-    `;
-  }
-}
-
-createNameInputs();
 
 rollBtn.onclick = () => {
-  const player = game.players[game.current];
-  const dice = biasedDiceRoll(player);
+  diceEl.classList.add("roll");
 
-  game.dice = dice;
-  diceText.textContent = "Dice: " + dice;
+  setTimeout(() => {
+    diceEl.classList.remove("roll");
 
-  if (player.pos === 0 && dice === 6) {
-    player.pos = 1;
-  } else if (player.pos > 0) {
-    player.pos += dice;
-    if (player.pos > PATH_LENGTH) player.pos = PATH_LENGTH;
-  }
+    const player = game.players[game.current];
+    let dice = window.forceSix ? 6 : biasedDice(player);
+    window.forceSix = false;
 
-  drawBoard();
+    diceText.textContent = dice;
 
-  if (dice !== 6) {
-    game.current = (game.current + 1) % game.players.length;
-  }
+    movePlayer(player, dice);
 
-  updateTurn();
+    if (dice !== 6) {
+      game.current = (game.current + 1) % game.players.length;
+    }
+
+    updateTurn();
+    renderTokens();
+  }, 500);
 };
 
-function updateTurn() {
-  const p = game.players[game.current];
-  turnText.textContent = `${p.name}'s turn`;
+function movePlayer(player, dice) {
+  let idx = player.tokens.findIndex(t => t === 0 && dice === 6 || t > 0);
+  if (idx === -1) return;
+
+  if (player.tokens[idx] === 0) {
+    player.tokens[idx] = 1;
+  } else {
+    player.tokens[idx] += dice;
+    if (player.tokens[idx] > PATH_LENGTH) {
+      player.tokens[idx] = PATH_LENGTH;
+    }
+  }
+
+  handleKills(player, idx);
 }
 
-function drawBoard() {
-  board.innerHTML = "";
-  for (let i = 1; i <= PATH_LENGTH; i++) {
-    const cell = document.createElement("div");
-    cell.className = "cell";
+function handleKills(player, tokenIndex) {
+  const pos = player.tokens[tokenIndex];
 
-    game.players.forEach(p => {
-      if (p.pos === i) {
-        const t = document.createElement("div");
-        t.className = `token ${p.color}`;
-        cell.appendChild(t);
+  if (SAFE_CELLS.includes(pos)) return;
+
+  game.players.forEach(p => {
+    if (p === player) return;
+    p.tokens = p.tokens.map(t => (t === pos ? 0 : t));
+  });
+}
+
+function renderTokens() {
+  document.querySelectorAll(".cell").forEach(c => c.innerHTML = "");
+
+  game.players.forEach(p => {
+    p.tokens.forEach(t => {
+      if (t > 0) {
+        const cell = document.querySelector(`[data-index="${t}"]`);
+        if (!cell) return;
+        const token = document.createElement("div");
+        token.className = `token ${p.color}`;
+        cell.appendChild(token);
       }
     });
-
-    board.appendChild(cell);
-  }
+  });
 }
+
+function updateTurn() {
+  turnText.textContent = `${game.players[game.current].name}'s turn`;
+                    }
