@@ -1,21 +1,39 @@
-const BOARD_SIZE = 13;
-const PATH_LENGTH = 52;
-
-const SAFE_CELLS = [1, 9, 14, 22, 27, 35, 40, 48];
+const BOARD_MAP = [
+  // 15x15 grid: 0 = empty, P = path, S = safe, R/G/Y/B = home
+  ".....RRRRR.....",
+  ".....RRRRR.....",
+  ".....RRRRR.....",
+  ".....RRRRR.....",
+  "PPPPPPSPPPPPPPP",
+  "R....P.....G...",
+  "R....P.....G...",
+  "R....S.....G...",
+  "R....P.....G...",
+  "PPPPPPPPPPPPPPP",
+  ".....YYYYY.....",
+  ".....YYYYY.....",
+  ".....YYYYY.....",
+  ".....YYYYY.....",
+  "..............."
+];
 
 function createBoard() {
   const board = document.getElementById("board");
   board.innerHTML = "";
 
-  for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
-    const cell = document.createElement("div");
-    cell.className = "cell";
+  BOARD_MAP.forEach(row => {
+    [...row].forEach(c => {
+      const cell = document.createElement("div");
+      cell.className = "cell";
 
-    if (SAFE_CELLS.includes(i)) {
-      cell.classList.add("safe");
-    }
+      if (c === "P") cell.classList.add("path");
+      if (c === "S") cell.classList.add("safe");
+      if (c === "R") cell.classList.add("home", "red");
+      if (c === "G") cell.classList.add("home", "green");
+      if (c === "Y") cell.classList.add("home", "yellow");
+      if (c === "B") cell.classList.add("home", "blue");
 
-    cell.dataset.index = i;
-    board.appendChild(cell);
-  }
+      board.appendChild(cell);
+    });
+  });
 }
