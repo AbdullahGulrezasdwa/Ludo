@@ -1,1 +1,38 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: #f4f4f4;
+}
 
+.hidden {
+  display: none;
+}
+
+#board {
+  margin: 20px auto;
+  width: 360px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 4px;
+}
+
+.cell {
+  background: white;
+  border: 1px solid #ccc;
+  height: 30px;
+  font-size: 12px;
+}
+
+.token {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin: 1px auto;
+}
+
+.red { background: red; }
+.green { background: green; }
+.yellow { background: gold; }
+.blue { background: blue; }
+.purple { background: purple; }
+.orange { background: orange; }
