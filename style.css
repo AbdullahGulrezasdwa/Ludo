@@ -9,8 +9,9 @@ body {
 #board {
   margin: 20px auto;
   display: grid;
-  grid-template-columns: repeat(15, 30px);
-  grid-template-rows: repeat(15, 30px);
+  grid-template-columns: repeat(13, 30px);
+  grid-template-rows: repeat(4, 30px);
+  gap: 2px;
 }
 
 .cell {
@@ -18,11 +19,6 @@ body {
   background: white;
   position: relative;
 }
-
-.home.red { background: #ffcccc; }
-.home.green { background: #ccffcc; }
-.home.yellow { background: #fff2cc; }
-.home.blue { background: #cce5ff; }
 
 .path { background: #fff; }
 .safe { background: #ddd; }
@@ -40,10 +36,5 @@ body {
 .green { background: green; }
 .yellow { background: gold; }
 .blue { background: blue; }
-.purple { background: purple; }
-.orange { background: orange; }
 
-#dice {
-  font-size: 40px;
-  margin: 10px;
-}
+#dice { font-size: 40px; margin: 10px; }
