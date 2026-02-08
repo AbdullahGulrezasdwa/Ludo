@@ -1,33 +1,36 @@
 body {
   font-family: Arial, sans-serif;
+  background: #f3f3f3;
   text-align: center;
-  background: #f4f4f4;
 }
 
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
 
 #board {
   margin: 20px auto;
-  width: 360px;
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(13, 32px);
+  grid-template-rows: repeat(13, 32px);
+  gap: 2px;
 }
 
 .cell {
   background: white;
-  border: 1px solid #ccc;
-  height: 30px;
-  font-size: 12px;
+  border: 1px solid #bbb;
+  position: relative;
+}
+
+.safe {
+  background: #ddd;
 }
 
 .token {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  margin: 1px auto;
+  position: absolute;
+  top: 8px;
+  left: 8px;
 }
 
 .red { background: red; }
@@ -36,3 +39,20 @@ body {
 .blue { background: blue; }
 .purple { background: purple; }
 .orange { background: orange; }
+
+.dice {
+  font-size: 40px;
+  animation: none;
+}
+
+.roll {
+  animation: shake 0.4s infinite;
+}
+
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
+}
