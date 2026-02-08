@@ -1,31 +1,36 @@
-const COLORS = ["red", "green", "yellow", "blue", "purple", "orange"];
-const TOKENS = 4;
-const PATH_LENGTH = 52;
+document.addEventListener("DOMContentLoaded", () => {
 
-let game = {
-  players: [],
-  current: 0
-};
-
+const boardDiv = document.getElementById("board");
+const namesDiv = document.getElementById("names");
+const startBtn = document.getElementById("startBtn");
+const rollBtn = document.getElementById("rollBtn");
+const setup = document.getElementById("setup");
+const gameDiv = document.getElementById("game");
 const turnText = document.getElementById("turnText");
 const diceText = document.getElementById("diceText");
-const rollBtn = document.getElementById("rollBtn");
+const playerCountInput = document.getElementById("playerCount");
 
-document.getElementById("playerCount").onchange = createInputs;
+const COLORS = ["red","green","yellow","blue"];
+let players = [];
+let currentPlayer = 0;
+const TOKENS = 4;
 
-function createInputs() {
-  names.innerHTML = "";
-  for (let i = 0; i < playerCount.value; i++) {
-    names.innerHTML += `<input id="name${i}" placeholder="Player ${i+1}">`;
+// Create name inputs
+function createNameInputs() {
+  namesDiv.innerHTML = "";
+  for (let i = 0; i < playerCountInput.value; i++) {
+    namesDiv.innerHTML += `<input id="name${i}" placeholder="Player ${i+1}"><br>`;
   }
 }
-createInputs();
+playerCountInput.addEventListener("change", createNameInputs);
+createNameInputs();
 
-function startGame() {
-  game.players = [];
-  for (let i = 0; i < playerCount.value; i++) {
+// Start Game
+startBtn.onclick = () => {
+  players = [];
+  for (let i = 0; i < playerCountInput.value; i++) {
     const name = document.getElementById("name" + i).value || COLORS[i];
-    game.players.push({
+    players.push({
       name,
       color: COLORS[i],
       tokens: Array(TOKENS).fill(0),
@@ -37,29 +42,29 @@ function startGame() {
   gameDiv.classList.remove("hidden");
 
   createBoard();
-  updateTurn();
-}
-
-rollBtn.onclick = () => {
-  const player = game.players[game.current];
-  const dice = rollDice(player);
-  diceText.textContent = dice;
-
-  let idx = player.tokens.findIndex(t => t === 0 && dice === 6 || t > 0);
-  if (idx !== -1) {
-    player.tokens[idx] += dice;
-    if (player.tokens[idx] > PATH_LENGTH) {
-      player.tokens[idx] = PATH_LENGTH;
-    }
-  }
-
-  if (dice !== 6) {
-    game.current = (game.current + 1) % game.players.length;
-  }
-
-  updateTurn();
+  renderTokens(players);
+  turnText.textContent = `${players[currentPlayer].name}'s turn`;
 };
 
-function updateTurn() {
-  turnText.textContent = `${game.players[game.current].name}'s turn`;
-}
+// Roll Dice
+rollBtn.onclick = () => {
+  const player = players[currentPlayer];
+  const dice = rollDice(player);
+  diceText.textContent = "Dice: " + dice;
+
+  const tokenIndex = player.tokens.findIndex(t => t === 0 && dice === 6 || t > 0);
+  if (tokenIndex !== -1) {
+    moveToken(player, tokenIndex, dice);
+    handleKills(players, currentPlayer);
+  }
+
+  renderTokens(players);
+
+  if (dice !== 6) {
+    currentPlayer = (currentPlayer + 1) % players.length;
+  }
+
+  turnText.textContent = `${players[currentPlayer].name}'s turn`;
+};
+
+});
