@@ -1,7 +1,7 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f3f3f3;
   text-align: center;
+  background: #f2f2f2;
 }
 
 .hidden { display: none; }
@@ -9,20 +9,23 @@ body {
 #board {
   margin: 20px auto;
   display: grid;
-  grid-template-columns: repeat(13, 32px);
-  grid-template-rows: repeat(13, 32px);
-  gap: 2px;
+  grid-template-columns: repeat(15, 30px);
+  grid-template-rows: repeat(15, 30px);
 }
 
 .cell {
+  border: 1px solid #999;
   background: white;
-  border: 1px solid #bbb;
   position: relative;
 }
 
-.safe {
-  background: #ddd;
-}
+.home.red { background: #ffcccc; }
+.home.green { background: #ccffcc; }
+.home.yellow { background: #fff2cc; }
+.home.blue { background: #cce5ff; }
+
+.path { background: #fff; }
+.safe { background: #ddd; }
 
 .token {
   width: 14px;
@@ -40,19 +43,7 @@ body {
 .purple { background: purple; }
 .orange { background: orange; }
 
-.dice {
+#dice {
   font-size: 40px;
-  animation: none;
-}
-
-.roll {
-  animation: shake 0.4s infinite;
-}
-
-@keyframes shake {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(10deg); }
-  50% { transform: rotate(-10deg); }
-  75% { transform: rotate(10deg); }
-  100% { transform: rotate(0deg); }
+  margin: 10px;
 }
