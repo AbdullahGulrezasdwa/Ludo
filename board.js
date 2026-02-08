@@ -1,39 +1,54 @@
-const BOARD_MAP = [
-  // 15x15 grid: 0 = empty, P = path, S = safe, R/G/Y/B = home
-  ".....RRRRR.....",
-  ".....RRRRR.....",
-  ".....RRRRR.....",
-  ".....RRRRR.....",
-  "PPPPPPSPPPPPPPP",
-  "R....P.....G...",
-  "R....P.....G...",
-  "R....S.....G...",
-  "R....P.....G...",
-  "PPPPPPPPPPPPPPP",
-  ".....YYYYY.....",
-  ".....YYYYY.....",
-  ".....YYYYY.....",
-  ".....YYYYY.....",
-  "..............."
-];
+// Handles board, token rendering, and safe zones
+
+const PATH_LENGTH = 52;
+const SAFE_CELLS = [1, 9, 14, 22, 27, 35, 40, 48];
 
 function createBoard() {
   const board = document.getElementById("board");
   board.innerHTML = "";
 
-  BOARD_MAP.forEach(row => {
-    [...row].forEach(c => {
-      const cell = document.createElement("div");
-      cell.className = "cell";
+  for (let i = 1; i <= PATH_LENGTH; i++) {
+    const cell = document.createElement("div");
+    cell.className = "cell path";
+    if (SAFE_CELLS.includes(i)) cell.classList.add("safe");
+    cell.dataset.pos = i;
+    board.appendChild(cell);
+  }
+}
 
-      if (c === "P") cell.classList.add("path");
-      if (c === "S") cell.classList.add("safe");
-      if (c === "R") cell.classList.add("home", "red");
-      if (c === "G") cell.classList.add("home", "green");
-      if (c === "Y") cell.classList.add("home", "yellow");
-      if (c === "B") cell.classList.add("home", "blue");
+function renderTokens(players) {
+  document.querySelectorAll(".cell").forEach(c => c.innerHTML = "");
 
-      board.appendChild(cell);
+  players.forEach(player => {
+    player.tokens.forEach(pos => {
+      if (pos > 0) {
+        const cell = document.querySelector(`[data-pos="${pos}"]`);
+        if (!cell) return;
+        const token = document.createElement("div");
+        token.className = `token ${player.color}`;
+        cell.appendChild(token);
+      }
+    });
+  });
+}
+
+function moveToken(player, tokenIndex, dice) {
+  if (player.tokens[tokenIndex] === 0 && dice === 6) {
+    player.tokens[tokenIndex] = 1;
+  } else if (player.tokens[tokenIndex] > 0) {
+    player.tokens[tokenIndex] += dice;
+    if (player.tokens[tokenIndex] > PATH_LENGTH) player.tokens[tokenIndex] = PATH_LENGTH;
+  }
+}
+
+function handleKills(players, currentPlayerIndex) {
+  const player = players[currentPlayerIndex];
+
+  player.tokens.forEach(pos => {
+    if (SAFE_CELLS.includes(pos) || pos === 0) return;
+    players.forEach((other, idx) => {
+      if (idx === currentPlayerIndex) return;
+      other.tokens = other.tokens.map(t => (t === pos ? 0 : t));
     });
   });
 }
